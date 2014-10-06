@@ -8,4 +8,7 @@ Keeps the original pictures.
   
 Things to fix:  
 - threads, for speed and no screen freeze  
-- other stuff that i can think of as i go along
+- other stuff that i can think of as i go along  
+  
+  
+Goal: Learn C#
