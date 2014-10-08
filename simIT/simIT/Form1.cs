@@ -28,15 +28,14 @@ namespace simIT
         public Form1()
         {
             InitializeComponent();
-
+            this.Text = "simIT";
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             
             this.button1.Enabled = false;
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
+            
 
             DirectoryInfo simItDir = Directory.CreateDirectory(simItFolder);
 
@@ -44,21 +43,34 @@ namespace simIT
 
             this.progressBar1.Maximum = allFiles.Count;
 
+            Thread sortThread = new Thread(sortingStart);
+            sortThread.IsBackground = true;
+            sortThread.Start();
+        }
+
+        private void sortingStart()
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             foreach (string file in allFiles)
             {
                 DateTime fileDate = GetDateTakenFromImage(file);
                 Console.WriteLine(file + " har dato " + fileDate.ToString("D"));
                 Console.WriteLine(simItFolder + "\\" + fileDate.ToString("D"));
                 addPictureToFolder(file, fileDate);
-                this.progressBar1.Increment(1);
+                progressBar1.BeginInvoke(
+                    new Action(() =>
+                     {
+                        progressBar1.Increment(1);
+                     }
+                ));
+                          
             }
-            Console.WriteLine("maximum stuff ------------ " + progressBar1.Maximum);
-            
+
             sw.Stop();
             TimeSpan timeUsed = sw.Elapsed;
             string elapsedTime = String.Format("{0:00}:{1:00}", timeUsed.Minutes, timeUsed.Seconds);
             Console.WriteLine("Runtime: " + elapsedTime);
-            
         }
 
 
