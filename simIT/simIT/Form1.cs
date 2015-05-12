@@ -19,16 +19,18 @@ namespace simIT
     public partial class Form1 : Form
     {
         private static ArrayList allFiles = new ArrayList();
-        private static string userPicFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
-        private static string simItFolder = userPicFolder + "\\simIT";
-        private static string[] dirsInSimIt = Directory.GetDirectories(simItFolder);
+        private static string userPicFolder;
+        private static string simItFolder;
+        private static string[] dirsInSimIt;
         private static string[] acceptedfiles = { ".jpg", ".jpeg", ".tiff", ".gif", ".bmp", ".png" };
         private static Regex r = new Regex(":");
 
         public Form1()
         {
             InitializeComponent();
-            this.Text = "simIT";
+            this.Text = "SimIT pictureSort";
+            userPicFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
+            simItFolder = userPicFolder + "\\SimIT";
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -36,16 +38,27 @@ namespace simIT
             
             this.button1.Enabled = false;
             
-
             DirectoryInfo simItDir = Directory.CreateDirectory(simItFolder);
 
+            dirsInSimIt = Directory.GetDirectories(simItFolder);
+            
             getAllFiles(userPicFolder);
 
-            this.progressBar1.Maximum = allFiles.Count;
+            if (allFiles.Count != 0)
+            {
+                this.progressBar1.Maximum = allFiles.Count;
 
-            Thread sortThread = new Thread(sortingStart);
-            sortThread.IsBackground = true;
-            sortThread.Start();
+                Thread sortThread = new Thread(sortingStart);
+                sortThread.IsBackground = true;
+                sortThread.Start();
+            }
+            else
+            {
+                MessageBox.Show("Could not find any pictures. This application only finds pictures that is in subfolders of the 'Pictures' folder.", "Did not run", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Directory.Delete(simItFolder);
+                this.button1.Enabled = true;
+            }
+            
         }
 
         private void sortingStart()
@@ -71,6 +84,7 @@ namespace simIT
             TimeSpan timeUsed = sw.Elapsed;
             string elapsedTime = String.Format("{0:00}:{1:00}", timeUsed.Minutes, timeUsed.Seconds);
             Console.WriteLine("Runtime: " + elapsedTime);
+            MessageBox.Show("Sorting done", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
 
